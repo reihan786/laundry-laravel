@@ -10,14 +10,16 @@ use SebastianBergmann\CodeCoverage\Report\Html\Dashboard;
 // });
 
 // (/):default route
-Route::get('/', [App\Http\Controllers\LoginController::class, 'login'])->name('login');
+Route::get('/', [App\Http\Controllers\LoginController::class, 'login']);
+Route::get('login', [App\Http\Controllers\LoginController::class, 'login'])->name('login');
 Route::post('actionLogin', [App\Http\Controllers\LoginController::class, 'actionLogin'])->name('actionLogin');
 Route::get('logout', [App\Http\Controllers\LoginController::class, 'logout'])->name('logout');
 
 Route::middleware(['auth'])->group(function () {
     Route::resource('dashboard', App\Http\Controllers\DashboardController::class);
-    Route::get('service', [DashboardController::class, 'indexService']);
-    Route::get('insert/service', [DashboardController::class, 'showInService']);
+    Route::resource('level', App\Http\Controllers\levelController::class);
+    Route::resource('service', App\Http\Controllers\ServiceController::class);
+    Route::resource('customer', App\Http\Controllers\CustomerController::class);
 });
 
 
