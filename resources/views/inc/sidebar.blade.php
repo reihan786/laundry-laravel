@@ -22,12 +22,22 @@
                     </li>
                       <li>
                         <a href="{{ route('level.index') }}">
-                            <i class="bi bi-circle"></i><span>level</span>
+                            <i class="bi bi-circle"></i><span>Level</span>
                         </a>
                     </li>
                       <li>
                         <a href="{{ route('customer.index') }}">
-                            <i class="bi bi-circle"></i><span>customer</span>
+                            <i class="bi bi-circle"></i><span>Customer</span>
+                        </a>
+                    </li>
+                      </li>
+                      <li>
+                        <a href="{{ route('user.index') }}">
+                            <i class="bi bi-circle"></i><span>User</span>
+                        </a>
+                    </li><li>
+                        <a href="{{ route('trans.index') }}">
+                            <i class="bi bi-circle"></i><span>Trans Order</span>
                         </a>
                     </li>
                     {{-- <li>
