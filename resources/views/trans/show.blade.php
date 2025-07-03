@@ -54,7 +54,7 @@
         <div class="card">
             <div class="card-body">
                 <h3 class="card-title">Transaksi Order</h3>
-                <form action="{{ route }}" method="post" id="paymentForm" data-order-id="{{ $details->id }}">
+                <form action="" method="post" id="paymentForm" data-order-id="{{ $details->id }}">
                     <table class="table table-bordered">
                         <thead>
                             <tr>
