@@ -19,6 +19,7 @@
 
     <!-- ======= Sidebar ======= -->
     @include('inc.sidebar')
+    <!-- End Sidebar-->
 
     <main id="main" class="main">
 
@@ -38,14 +39,17 @@
         </div>
 
 
+
     </main><!-- End #main -->
 
     <!-- ======= Footer ======= -->
     @include('inc.footer')
+    <!-- End Footer -->
 
     <a href="#" class="back-to-top d-flex align-items-center justify-content-center"><i
             class="bi bi-arrow-up-short"></i></a>
 
+    <!-- Vendor JS Files -->
     @include('inc.js')
 
     <script>
@@ -54,10 +58,16 @@
         const select = document.querySelector('#id_service');
         // button.textContent = "Duarr";
         // button.style.color = "red";
+
         const grandTotal = document.getElementById('grandTotal');
         const grandTotalInput = document.getElementById('grandTotalInput');
 
+        const orderPay = document.getElementById('order_pay');
+        const orderChange = document.getElementById('order_change');
+        const orderChangeDisplay = document.getElementById('order_change_display');
+        const totalInput = document.getElementById('totalInput');
         let no = 1;
+
         button.addEventListener("click", function() {
             const selectedProduct = select.options[select.selectedIndex];
             const productValue = selectedProduct.value;
@@ -108,13 +118,17 @@
             if (e.target.classList.contains('qtys')) {
                 const row = e.target.closest("tr");
                 const qty = parseFloat(e.target.value) || 0;
+
+                // qty kg / 1000
+                // const convertQty = parseFloat(qty / 1000) || 0;
+                // console.log(convertQty);
+                // end qty kg / 1000
+
                 const price = parseInt(row.querySelector('[name="price[]"]').value);
 
-                console.log(qty);
-                console.log(price);
                 row.querySelector('.totalText').textContent = price * qty;
-
                 row.querySelector('.totals').value = price * qty;
+
                 updateGrandTotal();
             }
         });
@@ -139,7 +153,77 @@
             grandTotalInput.value = grand;
         }
     </script>
+    <!-- script ke dua -->
+    <script>
+        function updateOrderChange() {
+            //kembali = orang bayar - total
+            const pay = parseInt(orderPay.value) || 0;
+            const total = parseInt(totalInput.value) || 0;
 
+            const change = pay - total;
+            orderChangeDisplay.value = change.toLocaleString('id-ID');
+            orderChange.value = change
+            console.log(change);
+        }
+        orderPay.addEventListener('input', updateOrderChange);
+    </script>
+
+    <script type="text/javascript" src="https://app.sandbox.midtrans.com/snap/snap.js"
+        data-client-key="{{ env('MIDTRANS_CLIENT_KEY') }}"></script>
+
+
+    <script>
+        document.getElementById('paymentForm').addEventListener('submit', function(e) {
+            e.preventDefault(); // Mencegah form submit biasa
+
+            const form = e.target;
+            const method = form.querySelector('[name="payment_method"]:checked, [name="payment_method"]:focus')
+                ?.value;
+
+            const data = {
+                order_pay: document.getElementById('order_pay').value,
+                order_change: document.getElementById('order_change').value,
+                payment_method: method,
+                _token: '{{ csrf_token() }}'
+            };
+
+            const orderId = form.dataset.orderId;
+
+            if (method === 'cash') {
+                //submit biasa untuk pembayaran cash
+                form.submit();
+            } else {
+                //kirim ke route laravel untuk generate snap token
+                fetch(`/trans/${orderId}/snap`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': data._token
+                        },
+                        body: JSON.stringify(data)
+
+                    })
+                    .then(res => res.json())
+                    .then(res => {
+                        if (res.token) {
+                            snap.pay(res.token, {
+                                onSuccess: function(result) {
+                                    window.location.href = `trans`;
+                                },
+                                onPending: function(result) {
+                                    alert("Silahkan selesaikan pembayaran Anda.");
+                                },
+                                onError: function(result) {
+                                    alert("gagal.");
+                                }
+                            });
+                        } else {
+                            alert("Gagal ambil token pembayaran.");
+                        }
+                    });
+            }
+        });
+    </script>
 
 </body>
 
